@@ -4,22 +4,15 @@ const fs = require("fs");
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
-    // Mesh / cardano-sdk pull in libsodium (top-level await) and sidan WASM;
-    // tell webpack the bundle target supports async/await so we don't get noisy
-    // "target environment does not appear to support async/await" warnings.
+    // Wallet dependencies use top-level await + async WASM.
     config.experiments = {
       ...config.experiments,
       asyncWebAssembly: true,
       topLevelAwait: true,
     };
-    config.output = {
-      ...config.output,
-      environment: {
-        ...(config.output.environment || {}),
-        asyncFunction: true,
-        dynamicImport: true,
-        module: true,
-      },
+    config.output.environment = {
+      ...config.output.environment,
+      asyncFunction: true,
     };
     config.resolve.fallback = {
       ...config.resolve.fallback,
